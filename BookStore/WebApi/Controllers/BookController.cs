@@ -35,12 +35,78 @@ namespace WebApi.AddControllers
             }
         };
 
+        //GET
         [HttpGet]
         public List<Book> GetBooks()
         {
             var bookList = BookList.OrderBy(x => x.id).ToList<Book>();
             return bookList;
         }
+
+        [HttpGet("{id}")]
+        public Book GetById(int id)
+        {
+            var book = BookList.Where(book => book.id == id).SingleOrDefault();
+            return book;
+        }
+/*
+        // ...Books?id=3
+        [HttpGet]
+        public Book GetById([FromQuery] string id)
+        {
+            var book = BookList.Where(book => book.id == Convert.ToInt32(id)).SingleOrDefault();
+            return book;
+        }
+*/
+
+        //POST
+        [HttpPost]
+        
+        public IActionResult AddBook([FromBody] Book newBook)
+        {
+            var book = BookList.SingleOrDefault(x => x.title == newBook.title);
+
+            if(book != null)
+                return BadRequest();
+
+
+            BookList.Add(newBook);
+            return Ok();
+        }
+
+        //PUT
+        [HttpPut("{id}")]
+        public IActionResult UpdateBook(int id,[FromBody] Book updatedBook)
+        {
+            var book = BookList.SingleOrDefault(x => x.id == id);
+
+            if(book == null)
+                return BadRequest();
+
+            book.genreId = updatedBook.genreId != default ? updatedBook.genreId : book.genreId;
+            book.pageCount = updatedBook.pageCount != default ? updatedBook.pageCount : book.pageCount;
+            book.publishDate = updatedBook.publishDate != default ? updatedBook.publishDate : book.publishDate;
+            book.title = updatedBook.title != default ? updatedBook.title : book.title;
+
+            return Ok();    
+        }
+
+        //DELETE
+        [HttpDelete("{id}")]
+
+        public IActionResult DeleteBook(int id)
+        {
+            var book = BookList.SingleOrDefault(x => x.id == id);
+
+            if(book == null)
+                return BadRequest();
+
+
+            BookList.Remove(book);
+            return Ok();
+        }
+
+
 
     }
 }
